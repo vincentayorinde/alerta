@@ -12,7 +12,14 @@
 > `npm i` <br>
 `npm start`
 
-# How run
+## How run
 > Access `/post-message`  <br>
 payload ``` { message: 'some messge', channel: 'some_channel'} ```
 
+## Tools
+- Express
+- Slack API
+
+
+## Author
+> [Vincent Ayorinde](https://github.com/vincentayorinde)
