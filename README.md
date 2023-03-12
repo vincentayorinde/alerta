@@ -3,7 +3,7 @@
 
 ## how to test
  > Setup keys <br>
-- Set your slack token and secret key in .env SLACK_TOKEN, KEY
+- Set your slack token and secret key in .env KEY
 
 ## Set Headers
 > ```secretKey: secret xxx```
@@ -13,8 +13,12 @@
 `npm start`
 
 ## How run
-> Access `/post-message`  <br>
-payload ``` { message: 'some messge', channel: 'some_channel'} ```
+> Access `/post_message`  <br>
+payload ``` {
+    "channel_name": "channel-for-notifications",
+    "channel_webhook": "SAMPLEB0M2K76K/VgAaHzV5YYat2IWEBHOOK",
+    "message": "testing message" 
+} ```
 
 ## Tools
 - Express
