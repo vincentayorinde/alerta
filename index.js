@@ -1,63 +1,62 @@
-const express = require('express')
-const cors = require('cors')
-const dotenv = require('dotenv')
-const SlackBot = require('slackbots')
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { checkMXRecord } from "./utils/mxLookup.js";
+import { sendToSlack } from "./utils/sendToSlack.js";
+import { sendToTelegram } from "./utils/sendToTelegram.js";
 
-dotenv.config()
+dotenv.config();
 
-const app = express()
+const app = express();
 
-app.use(cors())
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
 
-app.post('/post-message', (req, res) => {
-	const { secretkey } = req.headers
-	const { channel, message } = req.body
-	if (secretkey === `secret ${process.env.KEY}`) {
-		if (channel && message) {
-			sendToSlack(channel, message, res)
-		} else {
-			res.status(400).send({
-				success: false,
-				message: 'channel and message are required',
-			})
-		}
-	} else {
-		res.status(401).send({
-			success: false,
-			message: 'Unauthrized Access',
-		})
-	}
-})
+app.post("/check-mx-record", (req, res) => {
+  const { secretkey } = req.headers;
+  const { email } = req.body;
+  if (secretkey === `secret ${process.env.KEY}`) {
+    if (email) {
+      checkMXRecord(email, res);
+    } else {
+      res.status(400).send({
+        success: false,
+        message: "email is required",
+      });
+    }
+  } else {
+    res.status(401).send({
+      success: false,
+      message: "Unauthrized Access",
+    });
+  }
+});
 
-app.get('/', (req, res) => {
-	res.send({ message: 'Bitnob slack service' })
-})
+app.post("/post_message", (req, res) => {
+  const { secretkey } = req.headers;
+  const { channel_name, channel_webhook, message } = req.body;
+  if (secretkey === `secret ${process.env.KEY}`) {
+    if (channel_name && channel_webhook && message) {
+      sendToSlack(channel_name, channel_webhook, message, res);
+      sendToTelegram(channel_name, message, res);
+    } else {
+      res.status(400).send({
+        success: false,
+        message: "channel name, webhook and message are required!",
+      });
+    }
+  } else {
+    res.status(401).send({
+      success: false,
+      message: "Unauthrized Access",
+    });
+  }
+});
 
-const port = 5000 || process.env.PORT
-app.listen(port, () => console.log(`Listening on port ${port}`))
+app.get("/", (req, res) => {
+  res.send({ message: "Welcome to alerta service" });
+});
 
-/*
- Send to send message to slack channel
-*/
-function sendToSlack(channel, message, res) {
-    const bot = new SlackBot({
-        token: process.env.SLACK_TOKEN,
-        name: 'alerta',
-    })
-    bot.on('start', () => {
-        bot
-            .postMessageToChannel(channel, message)
-            .then((repoonse) => {
-                res.send(repoonse)
-            })
-            .catch((error) => {
-                console.error(error)
-            })
-    })
-    res.status(200).send({
-        success: true,
-        message: `Message post on ${channel} successfully!`,
-    })
-}
 
+const port = process.env.PORT || 5000;
+app.listen(port, () => console.log(`Listening on port ${port}`));
