@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/auth/slack', async (_, res) => {
-  const scopes = 'incoming-webhook';
+  const scopes = 'incoming-webhook,identity.basic,identity.email';
   const redirect_url = `${process.env.host}/auth/slack/callback`;
 
   const url = `https://slack.com/oauth/v2/authorize?client_id=${process.env.client_id}&scope=${scopes}&redirect_uri=${redirect_url}`;
