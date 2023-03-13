@@ -60,10 +60,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/auth/slack', async (_, res) => {
-  const scopes = 'incoming-webhook,identity.basic,identity.email';
+  const scopes = 'identity.basic,identity.email';
+  const bot_scope = 'incoming-webhook';
   const redirect_url = `${process.env.host}/auth/slack/callback`;
 
-  const url = `https://slack.com/oauth/v2/authorize?client_id=${process.env.client_id}&scope=${scopes}&redirect_uri=${redirect_url}`;
+  const url = `https://slack.com/oauth/v2/authorize?client_id=${process.env.client_id}&user_scopes=${schopes}&scope=${bot_scope}&redirect_uri=${redirect_url}`;
 
   res.status(200).header('Content-Type', 'text/html; charset=utf-8').send(`
             <html><body>
