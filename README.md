@@ -16,7 +16,7 @@
 > Access `/post_message`  <br>
 payload ``` {
     "channel_name": "channel-for-notifications",
-    "channel_webhook": "SAMPLEB0M2K76K/VgAaHzV5YYat2IWEBHOOK",
+    "channel_id": "SAMPLEB0M2K76K",
     "message": "testing message" 
 } ```
 

@@ -38,17 +38,23 @@ app.post('/check-mx-record', (req, res) => {
 app.post('/post_message', async (req, res) => {
   const { secretkey } = req.headers;
   const { channel_name, message, channel_id } = req.body;
+
   if (secretkey === `secret ${process.env.KEY}`) {
     if (channel_name && message && channel_id) {
-        console.log('>>>>>',channel_name, message, channel_id )
       const checkChannel = await read(channel_id);
-      console.log('the channel >>>>', checkChannel)
-      sendToSlack(checkChannel.channel, checkChannel.url, message, res);
+
+      if (checkChannel.channel == channel_name) {
+        sendToSlack(checkChannel.channel, checkChannel.url, message, res);
+      }
+      res.status(400).send({
+        success: false,
+        message: 'Channel name does not match',
+      });
       //   sendToTelegram(channel_name, message, res);
     } else {
       res.status(400).send({
         success: false,
-        message: 'channel name, webhook and message are required!',
+        message: 'channel name, ID and message are required!',
       });
     }
   } else {
@@ -86,9 +92,9 @@ app.get('/auth/slack/callback', async (req, res) => {
     });
 
     res.status(200).send(
-      `<html><body><p>You have successfully logged integrated Alerta to the slack channel! with your slack account! Here are connection details <strong>(Please Copy and keep safe)</strong>:</p><br>
+      `<html><body><h2>You have successfully logged integrated Alerta to the slack channel! with your slack account! <strong>(Please Copy and keep safe)</strong>:</h2><br>
         <h3>Channel Name: ${JSON.stringify(response.incoming_webhook.channel)}</h3>
-        <h3>Channel Name: ${JSON.stringify(response.incoming_webhook.channel_id)}</h3>
+        <h3>Channel ID: ${JSON.stringify(response.incoming_webhook.channel_id)}</h3>
         </body></html>`,
     );
     add(response.incoming_webhook);

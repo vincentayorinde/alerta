@@ -15,7 +15,6 @@ export const read = async (channel) => {
     const q = query(collection(db, 'channels'), where('channel_id', '==', channel));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      console.log('object', doc.data());
       store = doc.data();
     });
     return store;
