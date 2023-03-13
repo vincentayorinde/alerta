@@ -35,13 +35,15 @@ app.post('/check-mx-record', (req, res) => {
   }
 });
 
-app.post('/post_message', (req, res) => {
+app.post('/post_message', async (req, res) => {
   const { secretkey } = req.headers;
-  const { channel_name, message } = req.body;
+  const { channel_name, message, channel_id } = req.body;
   if (secretkey === `secret ${process.env.KEY}`) {
-    const checkChannel = read(channel_name);
-    if (channel_name && message && checkChannel) {
-      sendToSlack(channel_name, checkChannel.url, message, res);
+    if (channel_name && message && channel_id) {
+        console.log('>>>>>',channel_name, message, channel_id )
+      const checkChannel = await read(channel_id);
+      console.log('the channel >>>>', checkChannel)
+      sendToSlack(checkChannel.channel, checkChannel.url, message, res);
       //   sendToTelegram(channel_name, message, res);
     } else {
       res.status(400).send({
@@ -62,8 +64,6 @@ app.get('/', (req, res) => {
 });
 
 app.get('/auth/slack', async (_, res) => {
-  const checkChannel = await read('#skalebar-cohorts');
-  console.log('the log>>>>', checkChannel);
   const scopes = 'identity.basic,identity.email';
   const bot_scope = 'incoming-webhook';
   const redirect_url = `${process.env.host}/auth/slack/callback`;
@@ -85,13 +85,12 @@ app.get('/auth/slack/callback', async (req, res) => {
       code: req.query.code,
     });
 
-    res
-      .status(200)
-      .send(
-        `<html><body><p>You have successfully logged integrated Alerta to the slack channel! with your slack account! Here are the details:</p><p>Response: ${JSON.stringify(
-          response,
-        )}</p></body></html>`,
-      );
+    res.status(200).send(
+      `<html><body><p>You have successfully logged integrated Alerta to the slack channel! with your slack account! Here are connection details <strong>(Please Copy and keep safe)</strong>:</p><br>
+        <h3>Channel Name: ${JSON.stringify(response.incoming_webhook.channel)}</h3>
+        <h3>Channel Name: ${JSON.stringify(response.incoming_webhook.channel_id)}</h3>
+        </body></html>`,
+    );
     add(response.incoming_webhook);
   } catch (err) {
     console.log(err);
