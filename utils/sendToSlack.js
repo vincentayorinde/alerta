@@ -21,7 +21,15 @@ const handleRes = (res, code, message, success) => {
   if (res) return res.status(code).send({ success, message });
 };
 
-export const handleRedirect = async (url, data) =>{
-    const res = await axios.post(url, data);
-    console.log('the res>>', res)
-}
+export const handleRedirect = async (url, data) => {
+  const res = await axios.post(
+    url,
+    { ...data, client_id: process.env.client_id, scope: process.env.scope, client_secret: process.env.client_secret },
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    },
+  );
+  console.log('the res>>', res);
+};
