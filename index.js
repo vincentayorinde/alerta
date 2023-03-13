@@ -80,17 +80,14 @@ app.get('/auth/slack/callback', async (req, res) => {
       client_secret: process.env.client_secret,
       code: req.query.code,
     });
-    console.log('the response >>>', response)
-    const identity = await client.users.identity({
-      token: response.access_token,
-    });
+
 
     res
       .status(200)
       .send(
         `<html><body><p>You have successfully logged in with your slack account! Here are the details:</p><p>Response: ${JSON.stringify(
           response,
-        )}</p><p>Identity: ${JSON.stringify(identity)}</p></body></html>`,
+        )}</p></body></html>`,
       );
   } catch (err) {
     console.log(err);
