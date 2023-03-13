@@ -43,11 +43,6 @@ app.post('/post_message', async (req, res) => {
     if (channel_name && message && channel_id) {
       const checkChannel = await read(channel_id);
       sendToSlack(checkChannel.channel, checkChannel.url, message, res);
-
-      res.status(400).send({
-        success: false,
-        message: 'Channel name does not match',
-      });
       //   sendToTelegram(channel_name, message, res);
     } else {
       res.status(400).send({
