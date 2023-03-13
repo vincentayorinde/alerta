@@ -20,3 +20,8 @@ export const sendToSlack = async (channel_name, channel_webhook, message, res) =
 const handleRes = (res, code, message, success) => {
   if (res) return res.status(code).send({ success, message });
 };
+
+export const handleRedirect = async (url, data) =>{
+    const res = await axios.post(url, data);
+    console.log('the res>>', res)
+}

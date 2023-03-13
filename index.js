@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { checkMXRecord } from "./utils/mxLookup.js";
-import { sendToSlack } from "./utils/sendToSlack.js";
+import { sendToSlack, handleRedirect} from "./utils/sendToSlack.js";
 import { sendToTelegram } from "./utils/sendToTelegram.js";
 
 dotenv.config();
@@ -56,6 +56,10 @@ app.post("/post_message", (req, res) => {
 app.get("/", (req, res) => {
   res.send({ message: "Welcome to alerta service" });
 });
+
+app.get("/oauth", (req, res) => {
+    handleRedirect('https://slack.com/api/oauth.access', req.query)
+  });
 
 
 const port = process.env.PORT || 5000;
