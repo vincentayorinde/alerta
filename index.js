@@ -38,7 +38,7 @@ app.post("/post_message", (req, res) => {
   if (secretkey === `secret ${process.env.KEY}`) {
     if (channel_name && channel_webhook && message) {
       sendToSlack(channel_name, channel_webhook, message, res);
-      sendToTelegram(channel_name, message, res);
+    //   sendToTelegram(channel_name, message, res);
     } else {
       res.status(400).send({
         success: false,
