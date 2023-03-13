@@ -43,7 +43,7 @@ app.post('/post_message', async (req, res) => {
     if (channel_name && message && channel_id) {
       const checkChannel = await read(channel_id);
 
-      if (checkChannel.channel == channel_name) {
+      if (checkChannel.channel === channel_name) {
         sendToSlack(checkChannel.channel, checkChannel.url, message, res);
       }
       res.status(400).send({
