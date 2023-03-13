@@ -42,10 +42,8 @@ app.post('/post_message', async (req, res) => {
   if (secretkey === `secret ${process.env.KEY}`) {
     if (channel_name && message && channel_id) {
       const checkChannel = await read(channel_id);
+      sendToSlack(checkChannel.channel, checkChannel.url, message, res);
 
-      if (checkChannel.channel === channel_name) {
-        sendToSlack(checkChannel.channel, checkChannel.url, message, res);
-      }
       res.status(400).send({
         success: false,
         message: 'Channel name does not match',
@@ -92,7 +90,9 @@ app.get('/auth/slack/callback', async (req, res) => {
     });
 
     res.status(200).send(
-      `<html><body><h2>You have successfully integrated Alerta to ${response.incoming_webhook.channel} slack channel! <strong>(See access details below;)</strong>:</h2><br>
+      `<html><body><h2>You have successfully integrated Alerta to ${
+        response.incoming_webhook.channel
+      } slack channel! <strong>(See access details below;)</strong>:</h2><br>
         <h3>Channel Name: ${JSON.stringify(response.incoming_webhook.channel)}</h3>
         <h3>Channel ID: ${JSON.stringify(response.incoming_webhook.channel_id)}</h3>
         </body></html>`,
