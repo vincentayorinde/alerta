@@ -94,9 +94,9 @@ app.get('/auth/slack/callback', async (req, res) => {
       .send(
         `<html><body><p>You have successfully logged integrated Alerta to the slack channel! with your slack account! Here are the details:</p><p>Response: ${JSON.stringify(
           response,
-        )}</p><p>Identity: ${JSON.stringify(identity)}</p></body></html>`,
+        )}</p></body></html>`,
       );
-    add({ hook: response.incoming_webhook, identity });
+    add(response.incoming_webhook);
   } catch (err) {
     console.log(err);
     res.status(500).send(`<html><body><p>Something went wrong!</p><p>${JSON.stringify(err)}</p>`);
