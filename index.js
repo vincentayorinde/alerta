@@ -81,8 +81,8 @@ app.get('/auth/slack/callback', async (req, res) => {
       code: req.query.code,
     });
     console.log('the response >>>', response)
-    const identity = await client.bots.identity({
-      token: response.authed_user.access_token,
+    const identity = await client.users.identity({
+      token: response.access_token,
     });
 
     res
