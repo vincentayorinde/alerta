@@ -2,9 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { checkMXRecord } from './utils/mxLookup.js';
-import { sendToSlack, handleRedirect } from './utils/sendToSlack.js';
+import { sendToSlack } from './utils/sendToSlack.js';
 import { sendToTelegram } from './utils/sendToTelegram.js';
 import { WebClient } from '@slack/web-api';
+import { add, read } from './utils/firebase.js';
 
 const client = new WebClient();
 dotenv.config();
@@ -36,10 +37,11 @@ app.post('/check-mx-record', (req, res) => {
 
 app.post('/post_message', (req, res) => {
   const { secretkey } = req.headers;
-  const { channel_name, channel_webhook, message } = req.body;
+  const { channel_name, message } = req.body;
   if (secretkey === `secret ${process.env.KEY}`) {
-    if (channel_name && channel_webhook && message) {
-      sendToSlack(channel_name, channel_webhook, message, res);
+    const checkChannel = read(channel_name);
+    if (channel_name && message && checkChannel) {
+      sendToSlack(channel_name, checkChannel.url, message, res);
       //   sendToTelegram(channel_name, message, res);
     } else {
       res.status(400).send({
@@ -60,6 +62,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/auth/slack', async (_, res) => {
+  const checkChannel = await read('#skalebar-cohorts');
+  console.log('the log>>>>', checkChannel);
   const scopes = 'identity.basic,identity.email';
   const bot_scope = 'incoming-webhook';
   const redirect_url = `${process.env.host}/auth/slack/callback`;
@@ -73,7 +77,6 @@ app.get('/auth/slack', async (_, res) => {
         `);
 });
 
-
 app.get('/auth/slack/callback', async (req, res) => {
   try {
     const response = await client.oauth.v2.access({
@@ -82,22 +85,22 @@ app.get('/auth/slack/callback', async (req, res) => {
       code: req.query.code,
     });
 
+    const identity = await client.users.identity({
+      token: response.authed_user.access_token,
+    });
 
     res
       .status(200)
       .send(
         `<html><body><p>You have successfully logged integrated Alerta to the slack channel! with your slack account! Here are the details:</p><p>Response: ${JSON.stringify(
           response,
-        )}</p></body></html>`,
+        )}</p><p>Identity: ${JSON.stringify(identity)}</p></body></html>`,
       );
+    add({ hook: response.incoming_webhook, identity });
   } catch (err) {
     console.log(err);
     res.status(500).send(`<html><body><p>Something went wrong!</p><p>${JSON.stringify(err)}</p>`);
   }
-});
-app.get('/oauth', (req, res) => {
-  handleRedirect('https://slack.com/api/oauth.v2.access', req.query);
-  res.send({ message: 'Redirect successful' });
 });
 
 const port = process.env.PORT || 5000;
