@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { checkMXRecord } from './utils/mxLookup.js';
 import { sendToSlack } from './utils/sendToSlack.js';
+import { sendToDiscord } from './utils/sendToDiscord.js';
 import { sendToTelegram } from './utils/sendToTelegram.js';
 import { WebClient } from '@slack/web-api';
 import { add, read } from './utils/firebase.js';
@@ -35,7 +36,7 @@ app.post('/check-mx-record', (req, res) => {
   }
 });
 
-app.post('/post_message', async (req, res) => {
+app.post('/slack', async (req, res) => {
   const { secretkey } = req.headers;
   const { channel_name, message, channel_id } = req.body;
 
@@ -48,6 +49,27 @@ app.post('/post_message', async (req, res) => {
       res.status(400).send({
         success: false,
         message: 'channel name, ID and message are required!',
+      });
+    }
+  } else {
+    res.status(401).send({
+      success: false,
+      message: 'Unauthrized Access',
+    });
+  }
+});
+
+app.post('/discord', async (req, res) => {
+  const { secretkey } = req.headers;
+  const { webhook, message } = req.body;
+
+  if (secretkey === `secret ${process.env.KEY}`) {
+    if (webhook && message) {
+      sendToDiscord(webhook, message, res);
+    } else {
+      res.status(400).send({
+        success: false,
+        message: 'Webhook and message are required!',
       });
     }
   } else {
