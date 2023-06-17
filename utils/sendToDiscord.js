@@ -1,8 +1,5 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import Discord from 'discord.js'
-
-const discordWebhookURL = 'https://discord.com/api/webhooks/1119581355299315732/EiV2M1q-wfNNY85EtvBGhcOXinK7dWiknXyAErYWTtYnofa7u8kC-3Fn3rd4a_6de7m5'
 
 dotenv.config();
 
